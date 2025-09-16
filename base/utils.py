@@ -16,24 +16,26 @@ __all__ = [
 def find_dirs(path, pattern=None):
     '''Finds directories starting at the specified path and matching the
        specified pattern.'''
-    command = ('/usr/bin/find ' + path + ' -type d'
-               + (' -name "' + pattern + '"' if pattern is not None else ''))
-
-    results = subprocess.check_output(command, shell=True).decode()
-    if not results:
+    if not os.path.isdir(path):
         return []
-    else:
-        return results.rstrip().split("\n")
+
+    matched_dirs = []
+    for root, dirs, files in os.walk(path):
+        for d in dirs:
+            if pattern is None or fnmatch.fnmatch(d, pattern):
+                matched_dirs.append(os.path.join(root, d))
+    return matched_dirs
 
 
 def find_files(path, pattern=None):
     '''Finds files starting at the specified path and matching the specified
        pattern.'''
-    command = ('/usr/bin/find ' + path + ' -type f'
-               + (' -name "' + pattern + '"' if pattern is not None else ''))
-
-    results = subprocess.check_output(command, shell=True).decode()
-    if not results:
+    if not os.path.isdir(path):
         return []
-    else:
-        return results.rstrip().split("\n")
+
+    matched_files = []
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            if pattern is None or fnmatch.fnmatch(f, pattern):
+                matched_files.append(os.path.join(root, f))
+    return matched_files
