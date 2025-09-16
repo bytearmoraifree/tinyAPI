@@ -51,6 +51,12 @@ class ConnectionManager(object):
 
         _configure_dsh_builtins(dsh)
 
+        # Validate db and group parameters to prevent SQL injection
+        if not isinstance(db, str) or not db.isidentifier():
+            raise ValueError(f'Invalid database name provided: {db}')
+        if not isinstance(group, str) or not group.isidentifier():
+            raise ValueError(f'Invalid group name provided: {group}')
+
         return dsh.configure(self.config[server], db, group)
 
     def __get_data_store_handle(self, server):
